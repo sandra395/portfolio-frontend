@@ -1,0 +1,87 @@
+/* ================== Base Styles (Mobile First) ================== */
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+/* ===== Mobile First Header ===== */
+header {
+  display: flex;
+  flex-direction: column; /* stack on small screens */
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  gap: 8px;
+  width: 100%;
+  background-color: #6495ED;
+}
+
+header h1 {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0;
+  text-align: center; /* center on mobile */
+}
+
+.header-buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center; /* center buttons on mobile */
+}
+
+.header-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.logo {
+  height: 60px;
+}
+
+/* ===== Tablet and Desktop ===== */
+@media (min-width: 768px) {
+  header {
+    flex-direction: row; /* horizontal layout */
+    justify-content: space-between; /* h1 left, buttons right */
+    align-items: center;
+    min-height: 80px; /* Adjust min-height for desktop if needed */
+  }
+
+  header h1 {
+    font-size: 24px;
+    text-align: left; /* align left */
+  }
+
+  .header-buttons {
+    justify-content: flex-end; /* buttons on the right */
+    gap: 12px;
+  }
+
+  .header-buttons button {
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+}/* ================== Carousel Styles ================== */
+* Hide spinner buttons for number inputs */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Style for Carousel navigation arrows */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  filter: invert(100%) grayscale(100%) brightness(0%); /* Makes the white icons black */
+}
