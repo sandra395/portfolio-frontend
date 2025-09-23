@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { updateUser } from "../api";
 import { useNavigate, useParams } from "react-router-dom";
+import "../App.css";
 import Header from "./Header";
 import Footer from "./Footer";
+import axios from "axios";
 
 const EditProfile = () => {
   const { userId } = useParams();
@@ -15,9 +18,9 @@ const EditProfile = () => {
   });
 
   useEffect(() => {
-    fetch(`http://localhost:9090/api/users/${userId}`)
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchUser = async () => {
+      try {
+        const data = await getUser(userId);
         if (data.user) {
           setEditData({
             first_name: data.user.first_name,
@@ -26,8 +29,13 @@ const EditProfile = () => {
             phone_number: data.user.phone_number,
           });
         }
-      })
-      .catch((err) => console.error("Error fetching user info:", err));
+      } catch (err) {
+        console.error("Error fetching user info:", err);
+        alert("Failed to fetch user info");
+      }
+    };
+
+    fetchUser();
   }, [userId]);
 
   const handleInputChange = (e) => {
@@ -36,75 +44,74 @@ const EditProfile = () => {
   };
 
   const handleSave = async () => {
+    setLoading(true);
     try {
-      const res = await fetch(`http://localhost:9090/api/users/${userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editData),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.msg || "Update failed");
- 
-      
- alert("Profile updated successfully!");
- navigate(`/profile`);
-} catch (err) {
-  console.error("Error updating profile:", err);
-  alert("Failed to update profile");
-}
-};
+      await updateUser(userId, editData);
+      alert("Profile updated successfully!");
+      navigate(`/profile/${userId}`);
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      alert("Failed to update profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div>
-      <Header />
+    <div className="edit-profile-container">
       <h2>Edit Profile</h2>
 
-      <label>
-        First Name:{" "}
-        <input
-          type="text"
-          name="first_name"
-          value={editData.first_name}
-          onChange={handleInputChange}
-        />
-      </label>
-      <br />
-      <label>
-        Surname:{" "}
-        <input
-          type="text"
-          name="surname"
-          value={editData.surname}
-          onChange={handleInputChange}
-        />
-      </label>
-      <br />
-      <label>
-        Email:{" "}
-        <input
-          type="email"
-          name="email"
-          value={editData.email}
-          onChange={handleInputChange}
-        />
-      </label>
-      <br />
-      <label>
-        Phone:{" "}
-        <input
-          type="text"
-          name="phone_number"
-          value={editData.phone_number}
-          onChange={handleInputChange}
-        />
-      </label>
-      <br />
-      <button onClick={handleSave}>Save</button>
-      <button onClick={() => navigate(-1)}>
-        Cancel
-      </button>
-      <hr />
-      <Footer />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSave();
+        }}
+      >
+        <div className="edit-profile-row">
+          <label>First Name:</label>
+          <input
+            type="text"
+            name="first_name"
+            value={editData.first_name}
+            onChange={handleInputChange}
+          />
+        </div>
+        <br />
+        <div className="edit-profile-row">
+          <label>Surname:</label>
+          <input
+            type="text"
+            name="surname"
+            value={editData.surname}
+            onChange={handleInputChange}
+          />
+        </div>
+        <br />
+        <div className="edit-profile-row">
+          <label>Email:</label>
+          <input
+            type="email"
+            name="email"
+            value={editData.email}
+            onChange={handleInputChange}
+          />
+        </div>
+        <br />
+        <div className="edit-profile-row">
+          <label>Phone:</label>
+          <input
+            type="text"
+            name="phone_number"
+            value={editData.phone_number}
+            onChange={handleInputChange}
+          />
+        </div>
+        <br />
+        <button type="submit">Save</button>
+        <button type="button" onClick={() => navigate(-1)}>
+          Cancel
+        </button>
+      </form>
     </div>
   );
 };

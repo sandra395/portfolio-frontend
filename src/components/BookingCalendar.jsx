@@ -1,10 +1,13 @@
 import { useState } from "react";
+import "../App.css";
+import axios from "axios";
+import { createBooking } from "../api";
 
 export default function BookingCalendar() {
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
 
-  const propertyId = 9; // hardcoded property ID
+  const propertyId = 9;
 
   const handleBooking = async () => {
     if (!checkInDate || !checkOutDate) {
@@ -13,25 +16,20 @@ export default function BookingCalendar() {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:9090/api/properties/${propertyId}/booking`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            guest_id: 1, 
-            check_in_date: checkInDate,
-            check_out_date: checkOutDate,
-          }),
-        }
-      );
+      const data = await createBooking(propertyId, {
+        guest_id: currentUser.id,
+        check_in_date: checkInDate,
+        check_out_date: checkOutDate,
+      });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.msg || "Booking failed!");
       alert(`Booking successful! ID: ${data.booking_id}`);
+      setCheckInDate("");
+      setCheckOutDate("");
     } catch (err) {
       console.error(err);
-      alert(err.message);
+      alert(err.response?.data?.msg || "Booking failed");
+    } finally {
+      setLoading(false);
     }
   };
 

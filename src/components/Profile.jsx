@@ -1,68 +1,67 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import {
+  getUser,
+  getUserProperties,
+  getPropertyBookings,
+  getUserBookings,
+} from "../api";
 
-const Profile = ({ userId, favouriteProperties = [], reviews = [] }) => {
-  const [user, setUser] = useState(null);
+const Profile = ({ currentUser }) => {
   const [ownProperties, setOwnProperties] = useState([]);
-  const [bookings, setBookings] = useState([]);
-  
-
-
-  // ✅ Filter reviews that belong to this user
-  const myReviews = reviews.filter(r => r.guest_id === userId);
-
+  const [propertyBookings, setPropertyBookings] = useState({}); // Bookings on her properties
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Fetch user info
-    fetch(`http://localhost:9090/api/users/${userId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.user) setUser(data.user);
-        else console.error("User not found:", data);
-      })
-      .catch((err) => console.error("Error fetching user info:", err));
+    if (!currentUser?.id) return;
 
-    // Fetch own properties
-    fetch(`http://localhost:9090/api/properties?host=${userId}`)
-      .then((res) => res.json())
-      .then((data) => setOwnProperties(data.properties || []))
-      .catch((err) => console.error("Error fetching own properties:", err));
+    const fetchProfileData = async () => {
+      setLoading(true);
+      try {
+        // Fetch user info
+        const userData = await getUser(currentUser.id);
+        setUser(userData.user || currentUser);
 
-    // Fetch upcoming bookings
-    fetch(`http://localhost:9090/api/users/${userId}/bookings`)
-      .then((res) => res.json())
-      .then((data) => {
-        const today = new Date();
-        const upcoming = (data.bookings || [])
-          .filter(b => new Date(b.check_in_date) >= today) // only future bookings
-          .sort((a, b) => new Date(a.check_in_date) - new Date(b.check_in_date)); // sort by check-in
-        setBookings(upcoming);
-      })
-      .catch((err) => console.error("Error fetching bookings:", err));
-  }, [userId]);
+        // Fetch user's own properties
+        const propertiesData = await getUserProperties(currentUser.id);
+        const properties = propertiesData?.properties || [];
+        setOwnProperties(properties);
 
+        // Fetch bookings for each property
+        const bookingsMap = {};
+        await Promise.all(
+          properties.map(async (property) => {
+            const bookingData = await getPropertyBookings(property.property_id);
+            bookingsMap[property.property_id] = bookingData?.bookings || [];
+          })
+        );
+        setPropertyBookings(bookingsMap);
+      } catch (err) {
+        console.error("Failed to fetch profile data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchProfileData();
+  }, [currentUser]);
 
-  if (!user) return <p>Loading profile...</p>;
-    
+  if (loading) return <p>Loading profile...</p>;
+  if (!user) return <p>User not found.</p>;
+
   return (
-    <div>
-      <Header />
-      <h2>
+    <div className="profile-page-container">
+      <h2 className="profile-name">
         {user.first_name} {user.surname}{" "}
-        <Link to={`/profile/${userId}/edit`}>
+        <Link to={`/profile/${user.id}/edit`}>
           <img
             src="/edit.png"
             alt="Edit profile"
-            style={{
-              cursor: "pointer",
-              width: "20px",
-              height: "20px",
-              marginLeft: "8px",
-              verticalAlign: "middle"
-            }}
+            className="profile-edit-icon"
           />
         </Link>
       </h2>
@@ -71,14 +70,20 @@ const Profile = ({ userId, favouriteProperties = [], reviews = [] }) => {
         <img
           src={user.avatar}
           alt={`${user.first_name} avatar`}
-          width="100"
+          className="profile-avatar"
         />
       )}
 
-      <p>Email: {user.email}</p>
-      <p>Phone: {user.phone_number}</p>
+      <p>
+        <strong>Email:</strong> {user.email || currentUser.email}
+      </p>
+      <p>
+        <strong>Phone:</strong> {user.phone_number || currentUser.phone_number}
+      </p>
+
       <hr />
 
+      {/* Own Properties */}
       <h3>My Properties</h3>
       {ownProperties.length === 0 ? (
         <p>You haven't added any properties yet.</p>
@@ -86,69 +91,60 @@ const Profile = ({ userId, favouriteProperties = [], reviews = [] }) => {
         <ul>
           {ownProperties.map((property) => (
             <li key={property.property_id}>
-              <strong>{property.property_name}</strong> - {property.location} - £{property.price_per_night}/night
+              <strong>{property.property_name}</strong> <br />
+              {property.image && (
+                <img
+                  src={property.image}
+                  alt={property.property_name}
+                  className="property-image"
+                  width="200"
+                />
+              )}
+              Location: {property.location} <br />
+              Price: £{property.price_per_night}/night <br />
+              Type: {property.property_type} <br />
             </li>
           ))}
         </ul>
       )}
+
       <hr />
 
-      <h3>My Favourites</h3>
-      {favouriteProperties.length === 0 ? (
-        <p>You haven't favourited any properties yet.</p>
-      ) : (
-        <ul>
-          {favouriteProperties.map((property) => (
-            <li key={property.id}>
-              <strong>{property.title}</strong> <br />
-              {property.images && <img src={property.images} alt={property.title} width="200" />}<br />
-              {property.description} <br />
-              {property.location} <br />
-              £{property.price_per_night}/night <br />
-              {property.property_type} <br />
-              Favourites: {property.favourite_count}<br />
-              Host: {property.host} <br />
-            </li>
-          ))}
-        </ul>
-      )}
-      <hr />
-
+      {/* Upcoming Bookings on Own Properties */}
       <h3>Upcoming Bookings</h3>
-      {bookings.length === 0 ? (
-        <p>No upcoming bookings.</p>
+      {ownProperties.length === 0 ? (
+        <p>No properties, so no bookings.</p>
       ) : (
-        <ul>
-          {bookings.map(booking => (
-            <li key={booking.booking_id} style={{ marginBottom: "20px" }}>
-              <strong>Property Name:</strong> {booking.property_name} <br />
-              <strong>Host:</strong> {booking.host} <br />
-              {booking.image && <img src={booking.image} alt={booking.property_name} width="200" />} <br />
-              <strong>Check-in Date:</strong> {new Date(booking.check_in_date).toLocaleDateString()} <br />
-              <strong>Check-out Date:</strong> {new Date(booking.check_out_date).toLocaleDateString()} <br />
-            </li>
-          ))}
-        </ul>
+        ownProperties.map((property) => (
+          <div key={property.property_id}>
+            <h4>{property.property_name}</h4>
+            {propertyBookings[property.property_id]?.length === 0 ? (
+              <p>No upcoming bookings.</p>
+            ) : (
+              <ul>
+                {propertyBookings[property.property_id].map((booking) => (
+                  <li key={booking.booking_id} className="booking-item">
+                    <strong>Guest:</strong> {booking.guest_name} <br />
+                    <strong>Check-in:</strong>{" "}
+                    {new Date(booking.check_in_date).toLocaleDateString()}{" "}
+                    <br />
+                    <strong>Check-out:</strong>{" "}
+                    {new Date(booking.check_out_date).toLocaleDateString()}{" "}
+                    <br />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))
       )}
-    
-      <h1>My Reviews</h1>
-      {myReviews.length === 0 ? (
-        <p>No reviews yet.</p>
-      ) : (
-        <ul>
-          {myReviews.map((review) => (
-            <li key={review.review_id}>
-              <p>Property: {review.property_name}</p>
-              <p>Rating: {review.rating}</p>
-              <p>Comment: {review.comment}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-
 
       <hr />
-      <Footer />
+
+      {/* Reviews */}
+      <h3>My Reviews</h3>
+      <p>No reviews yet.</p>
+      <hr />
     </div>
   );
 };

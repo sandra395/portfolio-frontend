@@ -1,8 +1,9 @@
 import React from "react";
+import '../App.css';
 
 const Footer = () => {
   return (
-    <footer>
+    <footer className="site-footer">
       <div>
         <a href="/about">About Us</a> | 
         <a href="/faq">FAQ</a> | 
