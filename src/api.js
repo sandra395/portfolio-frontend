@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "https://portfolio-xxtl.onrender.com/";
+const API_BASE = "https://portfolio-xxtl.onrender.com/api";
 
 // ---------------- PROPERTIES ----------------
 export const getProperties = async () => {
