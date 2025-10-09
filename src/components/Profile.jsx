@@ -3,6 +3,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import editProfile from "../assets/edit.png";
 import {
   getUser,
   getUserProperties,
@@ -59,7 +60,7 @@ const Profile = ({ currentUser }) => {
         {user.first_name} {user.surname}{" "}
         <Link to={`/profile/${user.id}/edit`}>
           <img
-            src="/edit.png"
+            src={editProfile}
             alt="Edit profile"
             className="profile-edit-icon"
           />

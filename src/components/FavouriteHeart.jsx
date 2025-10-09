@@ -1,17 +1,14 @@
 import React from "react";
-import '../App.css';
+import "../App.css";
 
 const FavouriteHeart = ({ isFavourite, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="favourite-heart"
+      className={`favourite-heart ${isFavourite ? "filled" : "outline"}`}
       type="button"
-    >
-      {isFavourite ? "❤️" : "🤍"}
-    </button>
+    />
   );
 };
 
 export default FavouriteHeart;
-

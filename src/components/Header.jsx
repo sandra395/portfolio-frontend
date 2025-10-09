@@ -1,31 +1,41 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
+import bookingIcon from "../assets/booking.png";
+import logo from "../assets/logo.png";
+import profileIcon from "../assets/user.png";
 
 const Header = () => {
   const navigate = useNavigate();
 
+  // Create handler functions for clarity
+  const goToBookings = () => {
+    navigate("/bookings"); // Navigate to the /bookings route
+  };
+
+  const goToProfile = () => {
+    navigate("/profile"); // Navigate to the /profile route
+  };
+
   return (
     <header>
-      {/* Logo */}
+      {/* Add an onClick to navigate to the homepage when the logo is clicked */}
       <img
-        src="/logo.png"
-        alt="Logo"
         className="site-logo"
-        onClick={() => navigate("/")}
+        src={logo}
+        alt="Logo"
+        onClick={() => navigate("/")} // Navigate to homepage on logo click
       />
 
       <div className="header-buttons">
-        {/* My Bookings Button */}
-        <button onClick={() => navigate("/bookings")}>
-          <img src="/booking.png" alt="Bookings Icon" />
-          <span>My Bookings</span>
+        <button onClick={goToBookings}>
+          <img src={bookingIcon} alt="Bookings Icon" />
+          <span>Bookings</span>
         </button>
 
-        {/* My Profile Button */}
-        <button onClick={() => navigate("/profile")}>
-          <img src="/user.png" alt="Profile Icon" />
-          <span>My Profile</span>
+        <button onClick={goToProfile}>
+          <img src={profileIcon} alt="Profile Icon" />
+          <span>Profile</span>
         </button>
       </div>
     </header>

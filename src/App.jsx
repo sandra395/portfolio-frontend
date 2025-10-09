@@ -16,6 +16,7 @@ import SingleProperty from "./components/SingleProperty";
 import Profile from "./components/Profile";
 import EditProfile from "./components/EditProfile";
 import HomePage from "./components/HomePage";
+import FilteredPropertiesPage from "./components/FilteredPropertiesPage";
 
 function App() {
   const [savedProperties, setSavedProperties] = useState([]);
@@ -56,6 +57,11 @@ function App() {
           element={<Profile currentUser={currentUser} />}
         />
         <Route path="/profile/:userId/edit" element={<EditProfile />} />
+
+        <Route
+          path="/filtered-properties"
+          element={<FilteredPropertiesPage />}
+        />
       </Routes>
       <Footer />
     </div>

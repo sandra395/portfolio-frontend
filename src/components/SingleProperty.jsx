@@ -57,31 +57,12 @@ function SingleProperty({ saveProperty, currentUser }) {
         ).toFixed(1)
       : null;
 
+  // Toggle favourite
   const handleToggleFavourite = async () => {
     try {
-      const data = await toggleFavouriteProperty(
-        property.property_id,
-        currentUser.id
-      );
+      setIsFavourite(!isFavourite);
 
-      if (data.msg === "Property already favourited.") {
-        const favProperty = {
-          id: property.property_id,
-          title: property.property_name,
-          property_type: property.property_type,
-          images: property.images,
-          description: property.description,
-          location: property.location,
-          price_per_night: property.price_per_night,
-          host: property.host,
-          favourite_count: property.favourite_count,
-        };
-        saveProperty(favProperty);
-        setIsFavourite(true);
-        navigate("/profile");
-        return;
-      }
-
+      // Optional: send API request to save favourite
       const favProperty = {
         id: property.property_id,
         title: property.property_name,
@@ -91,8 +72,6 @@ function SingleProperty({ saveProperty, currentUser }) {
         images: property.images,
       };
       saveProperty(favProperty);
-      setIsFavourite(true);
-      navigate("/profile");
     } catch (err) {
       console.error("Error toggling favourite:", err);
       alert("Could not add favourite");
@@ -134,11 +113,21 @@ function SingleProperty({ saveProperty, currentUser }) {
         </div>
       )}
 
-      <p>Property type: {property.property_type}</p>
-      <p>Description: {property.description}</p>
-      <p>Location: {property.location}</p>
-      <p>Price per night: £{property.price_per_night}</p>
-      <p>Host: {property.host}</p>
+      <p>
+        <strong>Property type:</strong> {property.property_type}
+      </p>
+      <p>
+        <strong>Description:</strong> {property.description}
+      </p>
+      <p>
+        <strong>Location:</strong> {property.location}
+      </p>
+      <p>
+        <strong>Price per night:</strong> £{property.price_per_night}
+      </p>
+      <p>
+        <strong>Host:</strong> {property.host}
+      </p>
       <p>
         <img
           src={property.host_avatar}
