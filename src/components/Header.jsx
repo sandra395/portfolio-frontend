@@ -10,7 +10,7 @@ const Header = () => {
 
   // Create handler functions for clarity
   const goToBookings = () => {
-    navigate("/bookings"); // Navigate to the /bookings route
+    navigate("/bookings"); 
   };
 
   const goToProfile = () => {
