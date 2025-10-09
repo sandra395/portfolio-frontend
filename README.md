@@ -1,6 +1,6 @@
 ## AirbNC
 
-https://i.postimg.cc/HsQKzxTs/Screenshot-2025-10-09-at-20-28-01.png
+![Project Screenshot](https://i.postimg.cc/HsQKzxTs/Screenshot-2025-10-09-at-20-28-01.png)
 
 **UK Stays** is the frontend of a property booking platform (AirbNC), connecting to a custom backend API. It provides a user experience for browsing, reviewing, and booking properties.
 Currently, the app uses hardcoded user and host IDs for demonstration purposes.
