@@ -477,8 +477,8 @@ li img,
 
 .favourite-heart {
   position: absolute;
-  top: 15px;
-  right: 25px;
+  top: 5px;
+  right: 0px;
   cursor: pointer;
   font-size: 80px;
   background: transparent;
@@ -500,6 +500,9 @@ li img,
   transform: scale(1.2);
 }
 
+.site-footer {
+  margin-top: 50px;
+}
 /* ================== Media Queries ================== */
 
 /* ≤599px */
@@ -524,9 +527,10 @@ li img,
   }
 
   .favourite-heart {
+    position: absolute;
     font-size: 12vw;
-    top: 3%;
-    right: 3%;
+    top: 15px;
+    right: 10px;
   }
 }
 
@@ -549,12 +553,6 @@ li img,
   .bookings-list {
     grid-template-columns: repeat(2, 1fr);
   }
-
-  .favourite-heart {
-    font-size: 80px;
-    top: 20px;
-    right: 10px;
-  }
 }
 
 /* ≤992px */
@@ -566,8 +564,8 @@ li img,
 
   .favourite-heart {
     font-size: 10vw;
-    top: 4%;
-    right: 4%;
+    top: 5%;
+    right: 5%;
   }
 }
 
